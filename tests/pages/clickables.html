@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Clickables</title></head>
+<body>
+  <div id="card" onclick="void 0">Card with onclick</div>
+  <div role="button" id="rb">Role button</div>
+  <div role="checkbox" aria-checked="true" id="rc">ARIA checkbox</div>
+  <div id="ptr" style="cursor:pointer">Pointer div <span>inner span</span></div>
+  <span tabindex="0" id="ti">Focusable span</span>
+  <span tabindex="-1">Not focusable by tab</span>
+  <div contenteditable="true" id="ce">Editable <b>bold</b> text</div>
+  <label><input type="checkbox" id="fancy" style="opacity:0;position:absolute"> Fancy checkbox</label>
+  <button aria-expanded="false" aria-haspopup="menu">Menu</button>
+  <!-- TodoMVC pattern: transparent, unlabeled checkbox next to a styled label -->
+  <ul>
+    <li><input type="checkbox" class="toggle" style="opacity:0"><label>walk dog</label></li>
+  </ul>
+  <button style="opacity:0">Transparent button</button>
+</body>
+</html>

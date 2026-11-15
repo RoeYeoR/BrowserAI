@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Job Application</title>
+  <style>
+    section { display: none; padding: 10px; }
+    section.active { display: block; }
+    .err { color: #b00; }
+    [role=listbox] { list-style: none; border: 1px solid #999; padding: 0; margin: 0; width: 200px; }
+    [role=option] { padding: 4px; cursor: pointer; }
+    [role=switch] { display: inline-block; width: 40px; height: 20px; background: #ccc; border-radius: 10px; cursor: pointer; }
+    [role=switch][aria-checked=true] { background: #2a2; }
+    .fancy input { opacity: 0; position: absolute; }
+  </style>
+</head>
+<body>
+  <h1>Apply: Junior Developer</h1>
+  <p id="stepinfo">Step 1 of 3</p>
+
+  <!-- Step 1: native controls + custom validation -->
+  <section id="s1" class="active">
+    <label for="name">Full name</label> <input id="name" required><br>
+    <label for="email">Email</label>
+    <input id="email" type="email" aria-describedby="email-err"> <span id="email-err" class="err"></span><br>
+    <label for="country">Country</label>
+    <select id="country">
+      <option value="">Choose…</option>
+      <option value="il">Israel</option><option value="uk">United Kingdom</option>
+      <option value="us">United States</option><option value="de">Germany</option>
+    </select><br>
+    <fieldset><legend>Experience</legend>
+      <label><input type="radio" name="exp" value="0-1"> 0-1 years</label>
+      <label><input type="radio" name="exp" value="1-3"> 1-3 years</label>
+      <label><input type="radio" name="exp" value="3+"> 3+ years</label>
+    </fieldset>
+    <button id="next1">Next</button>
+  </section>
+
+  <!-- Step 2: dates and custom widgets -->
+  <section id="s2">
+    <label for="start">Earliest start date</label> <input id="start" type="date"><br>
+    <label for="dob">Graduation date</label> <input id="dob" placeholder="DD/MM/YYYY"><br>
+    <span id="skills-label">Main skill</span>
+    <button id="skills" role="combobox" aria-labelledby="skills-label" aria-controls="skills-list"
+            aria-expanded="false">Select a skill</button>
+    <ul id="skills-list" role="listbox" hidden>
+      <li role="option">Python</li><li role="option">JavaScript</li>
+      <li role="option">Java</li><li role="option">Go</li>
+    </ul><br>
+    <label for="city">City</label>
+    <input id="city" role="combobox" aria-controls="city-list" aria-autocomplete="list" autocomplete="off">
+    <ul id="city-list" role="listbox" hidden></ul><br>
+    <span id="remote-label">Open to remote work</span>
+    <div id="remote" role="switch" aria-checked="false" aria-labelledby="remote-label" tabindex="0"></div><br>
+    <label><input type="checkbox" id="newsletter"> Send me job alerts</label><br>
+    <button id="back2">Back</button> <button id="next2">Next</button>
+  </section>
+
+  <!-- Step 3: uploads, hidden checkbox, submit -->
+  <section id="s3">
+    <label for="cv">CV (PDF)</label> <input id="cv" type="file"><br>
+    <button id="portfolio-btn">Add portfolio</button>
+    <input id="portfolio" type="file" hidden> <span id="portfolio-name"></span><br>
+    <label for="cover">Cover letter</label><br><textarea id="cover"></textarea><br>
+    <label class="fancy"><input type="checkbox" id="terms"> I accept the terms</label><br>
+    <button id="back3">Back</button> <button id="submit">Submit application</button>
+    <p id="submit-err" class="err"></p>
+  </section>
+
+  <pre id="result"></pre>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let step = 1;
+    function show(n) {
+      step = n;
+      document.querySelectorAll("section").forEach((s) => s.classList.toggle("active", s.id === "s" + n));
+      $("stepinfo").textContent = n <= 3 ? `Step ${n} of 3` : "Done";
+    }
+
+    // Step 1 validation (custom, aria-invalid + described error)
+    $("next1").onclick = () => {
+      const ok = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test($("email").value);
+      $("email").setAttribute("aria-invalid", String(!ok));
+      $("email-err").textContent = ok ? "" : "Enter a valid email address";
+      if (ok && $("name").value.trim()) show(2);
+    };
+
+    // Custom listbox combobox
+    $("skills").onclick = () => {
+      const open = $("skills-list").hidden;
+      $("skills-list").hidden = !open;
+      $("skills").setAttribute("aria-expanded", String(open));
+    };
+    $("skills-list").querySelectorAll("[role=option]").forEach((o) => (o.onclick = () => {
+      $("skills").textContent = o.textContent;
+      $("skills").dataset.value = o.textContent;
+      $("skills-list").hidden = true;
+      $("skills").setAttribute("aria-expanded", "false");
+    }));
+
+    // Async autocomplete
+    const CITIES = ["Tel Aviv", "Haifa", "Jerusalem", "London", "Berlin", "Boston"];
+    let timer = null;
+    $("city").oninput = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const q = $("city").value.toLowerCase();
+        const hits = CITIES.filter((c) => c.toLowerCase().includes(q));
+        $("city-list").innerHTML = hits.map((c) => `<li role="option">${c}</li>`).join("");
+        $("city-list").hidden = !q || !hits.length;
+        $("city-list").querySelectorAll("li").forEach((li) => (li.onclick = () => {
+          $("city").value = li.textContent;
+          $("city").dataset.value = li.textContent;
+          $("city-list").hidden = true;
+        }));
+      }, 250);
+    };
+
+    // Switch
+    const toggleRemote = () => $("remote").setAttribute("aria-checked",
+      String($("remote").getAttribute("aria-checked") !== "true"));
+    $("remote").onclick = toggleRemote;
+
+    $("back2").onclick = () => show(1);
+    $("next2").onclick = () => show(3);
+    $("back3").onclick = () => show(2);
+
+    // Upload button that opens a hidden file input
+    $("portfolio-btn").onclick = () => $("portfolio").click();
+    $("portfolio").onchange = () => ($("portfolio-name").textContent = $("portfolio").files[0]?.name || "");
+
+    $("submit").onclick = () => {
+      if (!$("terms").checked) { $("submit-err").textContent = "Please accept the terms"; return; }
+      const exp = document.querySelector("input[name=exp]:checked");
+      $("result").textContent = JSON.stringify({
+        name: $("name").value, email: $("email").value, country: $("country").value,
+        experience: exp ? exp.value : null, start: $("start").value, graduation: $("dob").value,
+        skill: $("skills").dataset.value || null, city: $("city").dataset.value || null,
+        remote: $("remote").getAttribute("aria-checked") === "true", alerts: $("newsletter").checked,
+        cv: $("cv").files[0]?.name || null, portfolio: $("portfolio").files[0]?.name || null,
+        cover: $("cover").value, terms: $("terms").checked,
+      });
+      show(4);
+    };
+  </script>
+</body>
+</html>

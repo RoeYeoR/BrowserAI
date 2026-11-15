@@ -1,0 +1,8 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Long poll</title></head>
+<body>
+  <button>Ready</button>
+  <script>fetch("/api/slow?ms=10000");  // a request that stays open, like long-polling</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "browserai"
+version = "0.1.0"
+description = "Autonomous web navigation agent built on Playwright and Claude tool calling"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic>=1.0",
+    "Pillow>=10.1",
+    "playwright>=1.48",
+    "pydantic>=2.7",
+    "python-dotenv>=1.0",
+    "rich>=13.7",
+    "typer>=0.12",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "pyyaml>=6"]
+
+[project.scripts]
+browserai = "browserai.__main__:app"
+
+[tool.setuptools.packages.find]
+include = ["browserai*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]

@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Mini Shop</title></head>
+<body>
+  <nav>
+    <a href="#/home">Home</a>
+    <a href="#/products">Products</a>
+    <span id="cart">Cart: 0</span>
+  </nav>
+  <main id="app"></main>
+  <p id="status"></p>
+  <button id="del">Delete all</button>
+  <button id="alert">Show alert</button>
+  <button id="ask">Ask name</button>
+  <a href="help.html" target="_blank">Open help in new tab</a>
+  <a href="data:text/plain,hello" download="hello.txt">Download file</a>
+  <script>
+    let cart = 0;
+    let items = ["Widget", "Gadget", "Doohickey"];
+    const $ = (id) => document.getElementById(id);
+
+    async function route() {
+      const app = $("app");
+      if ((location.hash || "#/home") === "#/products") {
+        app.innerHTML = "<p>Loading…</p>";
+        await (await fetch("/api/slow?ms=800")).json();  // simulated API call
+        renderProducts();
+      } else {
+        app.innerHTML = "<h2>Home</h2>";
+      }
+    }
+
+    // Re-creates every node on each render, like many frameworks do.
+    function renderProducts() {
+      const app = $("app");
+      app.innerHTML = items.length
+        ? items.map((n) => `<div class="p"><span>${n}</span> <button>Add ${n}</button></div>`).join("")
+        : "<p>No items</p>";
+      app.querySelectorAll("button").forEach((b) => (b.onclick = () => {
+        cart++;
+        $("cart").textContent = "Cart: " + cart;
+        renderProducts();
+      }));
+    }
+
+    window.addEventListener("hashchange", route);
+    route();
+
+    $("del").onclick = () => {
+      if (confirm("Delete all items?")) { items = []; renderProducts(); $("status").textContent = "deleted"; }
+      else $("status").textContent = "kept";
+    };
+    $("alert").onclick = () => { alert("Saved!"); $("status").textContent = "alerted"; };
+    $("ask").onclick = () => { const n = prompt("Your name?"); $("status").textContent = "hello " + n; };
+  </script>
+</body>
+</html>

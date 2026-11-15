@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Safety</title></head>
+<body>
+  <p id="out">idle</p>
+  <a href="https://evil.example/phish" id="ext">Claim your prize</a>
+  <a href="/spa.html" id="int">Internal page</a>
+  <button onclick="window.open('https://evil.example/popup')">Open partner site</button>
+
+  <form id="login" onsubmit="event.preventDefault()">
+    <label for="user">Username</label> <input id="user">
+    <label for="pw">Password</label> <input id="pw" type="password">
+  </form>
+  <form id="pay" onsubmit="event.preventDefault()">
+    <label for="cc">Card number</label> <input id="cc" autocomplete="cc-number">
+    <label for="code">Verification code</label> <input id="code" autocomplete="one-time-code">
+    <label for="nick">Name on card</label> <input id="nick" autocomplete="cc-name">
+  </form>
+
+  <form id="search" onsubmit="event.preventDefault(); document.getElementById('out').textContent='searched'">
+    <input id="q" aria-label="Search"> <button>Search</button>
+  </form>
+  <form id="buy" onsubmit="event.preventDefault(); document.getElementById('out').textContent='bought'">
+    <input id="qty" aria-label="Quantity" value="1"> <button>Buy now</button>
+  </form>
+  <button onclick="document.getElementById('out').textContent='deleted'">Delete account</button>
+  <button onclick="document.getElementById('out').textContent='refreshed'">Refresh</button>
+</body>
+</html>

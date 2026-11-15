@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Actions</title></head>
+<body>
+  <p id="out">nothing yet</p>
+  <button id="btn" onclick="document.getElementById('out').textContent='button clicked'">Press me</button>
+  <form id="search" onsubmit="event.preventDefault(); document.getElementById('out').textContent='searched: ' + document.getElementById('q').value">
+    <input id="q" aria-label="Query" value="old">
+  </form>
+  <label><input type="checkbox" id="fancy" style="opacity:0;position:absolute"> Fancy checkbox</label>
+  <button id="covered" onclick="document.getElementById('out').textContent='covered clicked'">Under overlay</button>
+  <div style="position:absolute;top:0;left:0;width:100%;height:30px;pointer-events:auto" id="strip"></div>
+  <div id="box" style="height:100px;overflow:auto;border:1px solid">
+    <div style="height:1000px"><button id="inbox">Inside scroll box</button></div>
+  </div>
+  <div style="height:3000px"></div>
+  <button disabled>Disabled one</button>
+</body>
+</html>
